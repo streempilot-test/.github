@@ -1,0 +1,7 @@
+{
+  "name": "Independent contract CI",
+  "description": "Validate generated acceptance metadata, dependency pins, and deterministic fixtures with credential-free pull-request checks.",
+  "iconName": "check-circle",
+  "categories": ["Continuous integration", "Testing"],
+  "filePatterns": ["test-plan\\.json$", "scripts/validate-plan\\.mjs$"]
+}
