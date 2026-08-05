@@ -22,3 +22,13 @@ Browser-first live studio with WebRTC, guests, recording, RTMP destinations, Flu
 - `webrtc-e2e`: 3
 
 All generated pull-request workflows use least privilege, immutable action pins, and no persisted checkout credential. Integration workflows are gated by organization variables and credentials.
+
+<!-- org-project-routing:start -->
+## Planning and delivery
+
+- [GitHub Project: streempilot-test-project](https://github.com/orgs/streempilot-test/projects/1)
+- [Linear planning project](https://linear.app/denman/project/githubcomstreempilot-test-481b1eec976c)
+- [Detailed project-routing contract](../docs/PROJECTS.md)
+
+GitHub owns code and delivery evidence; Linear owns planning and dependencies. The linked organization Project provides the cross-repository execution view.
+<!-- org-project-routing:end -->
