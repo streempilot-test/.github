@@ -1,0 +1,37 @@
+name: portfolio policy
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  policy:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          show-progress: false
+          submodules: false
+      - name: Reject committed credential material
+        shell: bash
+        run: |
+          set -euo pipefail
+          pattern='(gh[pousr]_[A-Za-z0-9]{20,}|github_pat_[A-Za-z0-9_]{20,}|AKIA[0-9A-Z]{16}|BEGIN (RSA|OPENSSH|EC) PRIVATE KEY|Authorization:[[:space:]]*Bearer[[:space:]]+[A-Za-z0-9._-]{20,})'
+          if git grep -nEI "$pattern" -- . ':(exclude).github/workflows/portfolio-policy.yml'; then
+            echo 'credential-shaped material is committed to the repository' >&2
+            exit 1
+          fi
+      - name: Validate governance invariants
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f SECURITY.md
+          test -f CONTRIBUTING.md
+          test -f pull_request_template.md
+          grep -Fq 'short-lived GitHub App installation token' SECURITY.md
+          ! grep -RInE 'uses:[[:space:]]+[^[:space:]@]+@(main|master|v[0-9]+([.]?[0-9]+)*)[[:space:]]*$' .github/workflows
