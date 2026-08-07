@@ -1,7 +1,15 @@
 {
-  "name": "Independent contract CI",
+  "categories": [
+    "Continuous integration",
+    "Testing"
+  ],
   "description": "Validate generated acceptance metadata, dependency pins, and deterministic fixtures with credential-free pull-request checks.",
+  "filePatterns": [
+    "test-plan\\.json$",
+    "scripts/validate-plan\\.mjs$",
+    "test-plan\\.yaml$",
+    "dependency-contract\\.yaml$"
+  ],
   "iconName": "check-circle",
-  "categories": ["Continuous integration", "Testing"],
-  "filePatterns": ["test-plan\\.json$", "scripts/validate-plan\\.mjs$"]
+  "name": "Independent contract CI"
 }

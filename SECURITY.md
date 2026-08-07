@@ -2,3 +2,6 @@
 # Security policy
 
 Do not commit access tokens, production credentials, raw biometric material, unencrypted private media, or unredacted message content. Reproduce security failures with synthetic fixtures. Pull-request jobs must be credential-free; private cross-organization integration uses the organization-managed `TEST_FLEET_READ_TOKEN` only in gated workflows.
+# Security policy
+
+Never commit tokens, keys, production user data, biometric evidence, private messages, recordings, or unpublished provider credentials. Report vulnerabilities privately to the production owner.
