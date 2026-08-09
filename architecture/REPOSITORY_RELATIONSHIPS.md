@@ -3,7 +3,7 @@
 Generated from reviewed policy and the current **public** repository inventory.
 
 - Public repositories declared: **1**
-- Private repository names withheld: **28**
+- Private repository names withheld: **29**
 - Relationship edges: **0**
 
 ## Repository roles
