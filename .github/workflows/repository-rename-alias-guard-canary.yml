@@ -1,0 +1,76 @@
+name: Repository rename-alias guard upstream canary
+
+on:
+  pull_request:
+    paths:
+      - .github/workflows/repository-rename-alias-guard-canary.yml
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/repository-rename-alias-guard-canary.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: repository-rename-alias-guard-canary-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  upstream-contract:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    env:
+      UPSTREAM_REPOSITORY: ORESoftware/k8s-cluster
+      UPSTREAM_SHA: 8692ef218454ec7c1ddf5cd406d42d1285fc19f1
+      GUARD_SHA256: 8d5b3c0542d1f7a0d36a1945bae2aad4b3d873f895a8ac8875cb0be9d43239f1
+      TEST_SHA256: 6cd9610de2400d8f7e7456760841d223cabd5908621a8168844b5e679ee30662
+    steps:
+      - name: Fetch the exact public upstream guard and tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          work="$RUNNER_TEMP/repository-rename-alias-guard"
+          mkdir -p "$work"
+          base="https://raw.githubusercontent.com/${UPSTREAM_REPOSITORY}/${UPSTREAM_SHA}/scripts/ops"
+          curl --proto '=https' --tlsv1.2 -fsSL \
+            "$base/repository_rename_alias_guard.py" \
+            -o "$work/repository_rename_alias_guard.py"
+          curl --proto '=https' --tlsv1.2 -fsSL \
+            "$base/test_repository_rename_alias_guard.py" \
+            -o "$work/test_repository_rename_alias_guard.py"
+
+      - name: Verify exact upstream file identities
+        shell: bash
+        run: |
+          set -euo pipefail
+          work="$RUNNER_TEMP/repository-rename-alias-guard"
+          printf '%s  %s\n' \
+            "$GUARD_SHA256" "$work/repository_rename_alias_guard.py" \
+            "$TEST_SHA256" "$work/test_repository_rename_alias_guard.py" \
+            | sha256sum --check --strict
+
+      - name: Reject credential-shaped upstream content
+        shell: bash
+        run: |
+          set -euo pipefail
+          work="$RUNNER_TEMP/repository-rename-alias-guard"
+          credential_pattern='gh''p_|github_''pat_|-----BEGIN (RSA )?PRIVATE KEY-----'
+          if grep -nE "$credential_pattern" "$work"/*.py; then
+            echo 'credential-shaped content detected in upstream canary inputs' >&2
+            exit 1
+          fi
+
+      - name: Compile and run the independent guard contract
+        shell: bash
+        run: |
+          set -euo pipefail
+          work="$RUNNER_TEMP/repository-rename-alias-guard"
+          python3 -m py_compile \
+            "$work/repository_rename_alias_guard.py" \
+            "$work/test_repository_rename_alias_guard.py"
+          (
+            cd "$work"
+            python3 test_repository_rename_alias_guard.py -v
+          )
